@@ -14,6 +14,10 @@ node_modules/
 .idea/
 .vscode/
 
+# personal announcement copy (lives on the personal site, not in the package)
+# same convention as dsh-model-pricing
+docs/announcements.md
+
 # local scratch used by the live smoke test
 .env
 .env.local
