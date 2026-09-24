@@ -36,7 +36,7 @@
     "prepare": "node scripts/build-client.mjs",
     "prepack": "node scripts/build-client.mjs",
     "check": "node --check src/host/index.js && node --check src/host/provider.js && node --check src/host/protocol.js && node --check src/host/parse.js && node --check src/shared/config.mjs && node --check scripts/build-client.mjs && node --check scripts/check-locales.mjs && tsc --noEmit",
-    "test": "node --test \"test/**/*.test.mjs\"",
+    "test": "node --test test/*.test.mjs",
     "check-locales": "node scripts/check-locales.mjs",
     "typecheck": "tsc --noEmit"
   },
