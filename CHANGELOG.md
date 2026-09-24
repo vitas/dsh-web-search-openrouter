@@ -6,7 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [1.0.0] — 2025-09-24
 
-First public release.
+First public release. Published to npm as
+[`@samebits/dsh-web-search-openrouter`](https://www.npmjs.com/package/@samebits/dsh-web-search-openrouter).
 
 ### Added
 

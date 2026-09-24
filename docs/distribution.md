@@ -40,8 +40,8 @@ The package therefore declares **no install-time script**. That is deliberate:
 
 | Path | Command | Notes |
 |---|---|---|
-| GitHub (works today) | `dsh plugin add github:vitas/dsh-web-search-openrouter --profile web` | Applies the bundle patch at the next boot. No install-time script, so no pnpm allowlist entry is needed. |
-| Registry (once released) | `dsh plugin add @samebits/dsh-web-search-openrouter --profile web` | Same bundle patch. |
+| GitHub | `dsh plugin add github:vitas/dsh-web-search-openrouter --profile web` | Tracks the default branch. Applies the same bundle patch at the next boot; no install-time script, so no pnpm allowlist entry is needed. |
+| Registry (recommended) | `dsh plugin add @samebits/dsh-web-search-openrouter --profile web` | Published; same bundle patch. |
 | Linked checkout | `dsh plugin add link:$PWD --profile web` | Run `npm install && npm run build` first. |
 
 Both paths compose the web seam and the provider row from
