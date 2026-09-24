@@ -25,15 +25,24 @@ client entry listed in `dsh.client`. Running esbuild at install time would requi
 a devDependency in a production install; committing the bundle keeps the install
 to a plain extract, exactly like the harness's own client packages.
 
-`prepare` and `prepack` still build it for local development, so a `link:`
-checkout is always in sync.
+The package therefore declares **no install-time script**. That is deliberate:
+
+- pnpm blocks `prepare` on git-hosted packages unless the package is added to the
+  profile's `onlyBuiltDependencies` allowlist, which would turn the documented
+  one-line `dsh plugin add github:…` into a two-step install;
+- a plugin that others install should not execute code at install time when the
+  artifact it would produce is already committed.
+
+`prepack` still rebuilds the bundle for `npm pack` / `npm publish`, and
+`npm run build` is the local development path.
 
 ## Installation paths
 
 | Path | Command | Notes |
 |---|---|---|
-| Registry (recommended) | `dsh plugin add @samebits/dsh-web-search-openrouter --profile web` | Applies the bundle patch at the next boot. |
-| Linked checkout | `dsh plugin add link:$PWD --profile web` | Same bundle patch; run `npm install && npm run build` first. |
+| GitHub (works today) | `dsh plugin add github:vitas/dsh-web-search-openrouter --profile web` | Applies the bundle patch at the next boot. No install-time script, so no pnpm allowlist entry is needed. |
+| Registry (once released) | `dsh plugin add @samebits/dsh-web-search-openrouter --profile web` | Same bundle patch. |
+| Linked checkout | `dsh plugin add link:$PWD --profile web` | Run `npm install && npm run build` first. |
 
 Both paths compose the web seam and the provider row from
 [`cordis.patch.yml`](../cordis.patch.yml). The profile's own
@@ -75,7 +84,7 @@ manually before 1.0.0, delete those rows when you switch to the bundled install.
 npm ci
 npm run check          # syntax + typecheck
 npm run check-locales
-npm test               # 35 offline tests
+npm test               # 34 offline tests (the live one self-skips)
 DSH_WEB_SEARCH_LIVE=1 OPENROUTER_API_KEY=… \
   DSH_WEB_SEARCH_BASE_URL=… DSH_WEB_SEARCH_MODEL=… \
   node --test test/live.test.mjs

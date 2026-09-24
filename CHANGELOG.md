@@ -32,7 +32,7 @@ First public release.
 - Routable failures (`WEB_PROVIDER_CREDENTIAL_MISSING`, `WEB_ABORTED`,
   `WEB_PROVIDER_ERROR`), including a distinct error when the gateway answers
   without running a server-side search.
-- 35 offline tests (`node --test`) plus an opt-in live smoke test.
+- 34 offline tests (`node --test`) plus an opt-in live smoke test.
 - Bundle patch (`dsh.bundle.patch`) that points the web seam at this provider and
   composes the provider row, so `dsh plugin add` is the whole installation.
 - GitHub Actions CI: host syntax check, client typecheck, locale parity, unit

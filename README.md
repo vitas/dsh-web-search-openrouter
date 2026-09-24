@@ -178,11 +178,11 @@ and raise `searchMaxQueries` only when you actually need breadth. See
 ## Development
 
 ```sh
-npm install          # installs esbuild + typescript, builds lib/client.js
-npm run check        # syntax check the host + typecheck the client
-npm test             # 34 offline tests, no network, no credentials
+npm install          # esbuild + typescript
+npm run check        # host syntax check + client typecheck
+npm test             # 35 tests, no network, no credentials (1 skipped: the live one)
 npm run check-locales
-npm run build        # rebuild lib/client.js
+npm run build        # rebuild the committed lib/client.js (also runs on npm pack)
 ```
 
 A live smoke test is opt-in and never runs in CI:
