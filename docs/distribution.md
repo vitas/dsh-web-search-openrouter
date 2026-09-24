@@ -93,8 +93,27 @@ npm pack --dry-run     # confirm the file set
 ```
 
 Then: bump `version` in `package.json`, move the CHANGELOG's unreleased section
-into the new version, tag `vX.Y.Z`, and `npm publish --access public` (the package
-is scoped, so `--access public` is required).
+into the new version, commit, and publish.
+
+## Publishing
+
+Two paths, both guarded by the same pre-flight:
+
+- **Locally** — `npm publish` (the package is scoped, so it needs
+  `--access public`, which `publishConfig.access` now supplies).
+- **From CI** — the [`publish`](../.github/workflows/publish.yml) workflow.
+  `workflow_dispatch` packs by default; set `dry_run: false`, or publish a GitHub
+  release, to upload. It re-runs the checks, rebuilds the bundle, and **fails if
+  the committed `lib/client.js` differs from the rebuild**, so the tarball can
+  never ship a browser half that is not the one under review. It uploads with
+  `--provenance`.
+
+Auth for the CI path is either an npm **Automation** token stored as the
+repository secret `NPM_TOKEN` (automation tokens bypass the account's 2FA prompt,
+which interactive `npm login` cannot do from a runner), or npm **trusted
+publishing**: register this repository as a trusted publisher for the package on
+npmjs.com and drop the `NODE_AUTH_TOKEN` line — npm then authenticates with the
+run's OIDC identity and no secret is stored at all.
 
 ## Versioning
 

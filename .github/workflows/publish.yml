@@ -1,0 +1,54 @@
+name: publish
+
+# Release path. `workflow_dispatch` packs by default (a safe dry run) and
+# uploads only when `dry_run` is false; publishing a GitHub release uploads
+# directly. The bundle is rebuilt here and diffed against the committed
+# lib/client.js before anything is uploaded, so the tarball can never ship a
+# browser half that is not the one under review.
+#
+# Auth: set an npm Automation token as the repository secret NPM_TOKEN. If you
+# would rather not keep a token, configure this repository as a trusted
+# publisher for the package on npmjs.com and delete the NODE_AUTH_TOKEN line
+# below — npm then authenticates with the run's OIDC identity.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Pack without uploading
+        type: boolean
+        default: true
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - name: Host syntax + client typecheck
+        run: npm run check
+      - name: Locale parity
+        run: npm run check-locales
+      - name: Tests
+        run: npm test
+      - name: Rebuild the browser bundle
+        run: npm run build
+      - name: The committed bundle is what we ship
+        run: git diff --exit-code -- lib/client.js
+      - name: Pack only
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: npm pack --dry-run
+      - name: Publish to npm
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
