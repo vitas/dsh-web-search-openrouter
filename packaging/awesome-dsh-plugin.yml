@@ -1,10 +1,17 @@
 # Ready-to-submit entry for https://github.com/awesome-dsh-plugin/awesome-dsh-plugin
-# Open a PR that adds this file to the list repo as:
+# The list lives in data/plugins/, one file per plugin. Submit as:
 #   data/plugins/vitas__dsh-web-search-openrouter.yml
 # (READMEs in that repo are generated from data/plugins/*.yml — do not edit them.)
+#
+# Requirements met: package.json declares dsh.bundle.patch and ships
+# cordis.patch.yml; the repo carries real, working code and the dsh-plugin
+# topic. The list's CI also requires the repo to be at least 1 day old
+# (MIN_AGE_DAYS = 1 in scripts/check-submission.mjs); the submission gate
+# re-runs automatically every six hours, so an under-age PR goes green on its
+# own once the repository crosses the bar.
 url: https://github.com/vitas/dsh-web-search-openrouter
 name: vitas/dsh-web-search-openrouter
-category: web
+category: browser
 description:
-  en: 'Grounded web search for DSH on an OpenRouter-compatible gateway: the built-in web_search tool runs server-side on the same endpoint and key as your chat models, with three request protocols, every citation shape parsed, and an editable settings card with a live connection test.'
-  zh: '让 DSH 内置 web_search 工具走 OpenRouter 兼容网关：与对话模型共用端点和密钥，支持三种请求协议、解析全部引用格式，并提供可随时编辑、带实时连接测试的设置卡片。'
+  en: 'Runs the built-in web_search tool server-side on an OpenRouter-compatible gateway, so search uses the same endpoint and key as the chat models: three request protocols, every citation shape parsed (including snippets recovered from the cited span), and a settings card with a live connection test.'
+  zh: '让内置 web_search 工具走 OpenRouter 兼容网关，与对话模型共用端点和密钥：支持三种请求协议，解析全部引用格式（含从引用区间还原摘要），并提供带实时连接测试的设置卡片。'

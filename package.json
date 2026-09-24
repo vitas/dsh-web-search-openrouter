@@ -71,5 +71,8 @@
   "homepage": "https://github.com/vitas/dsh-web-search-openrouter#readme",
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
