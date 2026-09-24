@@ -35,15 +35,22 @@ harness's bundled DeepSeek search and onto your own gateway budget.
 
 ## Install
 
+From GitHub — the package ships a bundle patch (`dsh.bundle.patch`), so adding it
+composes everything: it points the web seam at this provider and inserts the
+provider row.
+
+```sh
+dsh plugin add github:vitas/dsh-web-search-openrouter --profile web
+```
+
+From npm, once released under this name:
+
 ```sh
 dsh plugin add @samebits/dsh-web-search-openrouter --profile web
 ```
 
-The package ships a bundle patch (`dsh.bundle.patch`), so adding it composes
-everything: it points the web seam at this provider and inserts the provider row.
-
 <details>
-<summary>Installing from a git checkout instead</summary>
+<summary>Installing from a local checkout</summary>
 
 ```sh
 git clone https://github.com/vitas/dsh-web-search-openrouter.git
