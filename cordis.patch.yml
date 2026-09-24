@@ -1,0 +1,31 @@
+# Bundle-layer patch for @samebits/dsh-web-search-openrouter.
+#
+# Applied by the loader when this package is listed in `dsh.profile.bundles`
+# (or added with `dsh plugin add`), BEFORE the profile's own
+# `cordis.patch.yml`. It does the whole deployment generically: point the web
+# seam at this provider and compose the provider row itself. Every value here is
+# a neutral default the Plugins settings card can override at runtime, and the
+# user's patch addresses the same rows by id, last write winning.
+#
+# A patch replaces the targeted row's whole `config`, so the `web` row restates
+# every field the base default carries (`searchProvider` + `fetchProvider`).
+
+- id: web
+  config:
+    searchProvider: openrouter
+    fetchProvider: http
+
+- insert:
+    - id: web-search-openrouter
+      name: '@samebits/dsh-web-search-openrouter'
+      config:
+        # Native OpenAI `web_search` tool — what OpenAI, Azure, and
+        # OpenRouter-compatible gateways that proxy the native tool accept.
+        # Switch to `openrouter` for openrouter.ai's own server tool, or to the
+        # deprecated `plugin` field for older gateways.
+        protocol: openai
+        # Credential reference, resolved per search through the credentials
+        # service (Settings → Models) and then the process environment.
+        apiKeyEnv: OPENROUTER_API_KEY
+        baseURL: https://openrouter.ai/api/v1
+        model: openai/gpt-5.2

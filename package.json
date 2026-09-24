@@ -1,0 +1,76 @@
+{
+  "name": "@samebits/dsh-web-search-openrouter",
+  "version": "1.0.0",
+  "description": "Grounded web search for DeepSeek Harness through OpenRouter-compatible gateways: the built-in web_search tool runs on the same endpoint and key as your chat models, returns citeable sources, and is configurable from the Plugins settings page.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "./src/host/index.js",
+  "exports": {
+    ".": "./src/host/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-settings-plugins"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build-client.mjs",
+    "prepare": "node scripts/build-client.mjs",
+    "prepack": "node scripts/build-client.mjs",
+    "check": "node --check src/host/index.js && node --check src/host/provider.js && node --check src/host/protocol.js && node --check src/host/parse.js && node --check src/shared/config.mjs && node --check scripts/build-client.mjs && node --check scripts/check-locales.mjs && tsc --noEmit",
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "check-locales": "node scripts/check-locales.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": ">=3.18.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2",
+    "@types/react": "^18.3.31",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "web-search",
+    "web_search",
+    "grounding",
+    "citations",
+    "openrouter",
+    "responses-api",
+    "server-tools"
+  ],
+  "author": "Vitali Ryumshin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitas/dsh-web-search-openrouter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vitas/dsh-web-search-openrouter/issues"
+  },
+  "homepage": "https://github.com/vitas/dsh-web-search-openrouter#readme",
+  "engines": {
+    "node": ">=20"
+  }
+}

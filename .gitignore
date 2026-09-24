@@ -1,0 +1,19 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# build output is committed (lib/client.js) — keep the rest out
+*.tsbuildinfo
+
+# local/runtime
+.cache/
+*.log
+.DS_Store
+
+# editor
+.idea/
+.vscode/
+
+# local scratch used by the live smoke test
+.env
+.env.local
