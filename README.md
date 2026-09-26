@@ -87,6 +87,27 @@ name. The plugin reports that honestly — if the gateway answers without
 searching, the search fails with an explanatory error instead of silently
 returning the model's memory.
 
+### Why not just point the built-in provider at my gateway?
+
+The built-in `dsh-web-search-deepseek` provider is Anthropic-compatible and does
+expose `baseURL` and `model`, so re-pointing it at a cheaper gateway is the
+obvious first idea. On `api.b.ai` it does not work — the Anthropic route there
+accepts the request and never runs the search. Measured 2026-09-24, sending
+exactly the built-in provider's body (`tools: [{ type: 'web_search_20250305',
+name: 'web_search', max_uses: 3 }]`, `anthropic-version: 2023-06-01`) to
+`https://api.b.ai/v1/messages`:
+
+| Model | Result |
+|---|---|
+| `deepseek-v4.1-flash` | HTTP 200, one `text` block, **0 search results**, 44 input tokens — answered from memory |
+| `gpt-5.4-nano` | HTTP 200, a `tool_use` block, **0 search results** — the tool came back as a *client-side* call for the model to make, not a server-side search |
+
+Only `/v1/responses` with the native OpenAI tool actually searches there, and
+only for the OpenAI family. That is the gap this plugin fills, and it is also
+why the search model is configured separately from the chat model: on this
+gateway the two cannot be the same model, and the cheap chat models are exactly
+the ones that cannot search.
+
 ### `api.b.ai` (protocol `openai`)
 
 Verified working on `/v1/responses` with `tools: [{ type: 'web_search' }]`, hits
