@@ -100,9 +100,32 @@ returned as `url_citation` annotations. Cheapest first:
 | `gpt-5-mini` | 4 | large input token count |
 | `gpt-6-astra`, `gpt-6-sol`, `gpt-5.6-sol`, `gpt-5.5` | 1–4 | |
 
-Not supported on this gateway: `gpt-5-nano`, `glm-*`, `deepseek-*`, the
-Anthropic and Gemini routes, `:online` suffixes, `plugins: [{ id: 'web' }]`, and
-`openrouter:web_search`.
+Not supported on this gateway, and *how* each one fails matters, because they
+look nothing alike:
+
+| What | What you get | Why |
+|---|---|---|
+| `glm-*`, `deepseek-*`, `qwen*`, `minimax-*`, `mimo-*` | HTTP 200, no search | these providers don't implement OpenAI's server-side `web_search` tool, and an unknown tool is ignored rather than rejected |
+| `gpt-5-nano` | HTTP 200, answers from memory | same family as the model that works, but this one never calls the tool |
+| Gemini and Anthropic routes | HTTP 400, `model … is not supported on /v1/responses; use /v1/chat/completions instead` | those families aren't routable through the Responses API here at all |
+| `:online` suffixes, `plugins: [{ id: 'web' }]` | rejected or ignored | OpenRouter's own conventions — this gateway isn't OpenRouter |
+| `openrouter:web_search` | rejected by the request validator | an OpenRouter-proprietary server tool |
+
+**Input tokens are how you tell a real search from a silent no-op.** When the
+tool runs, the results are injected back into the context, so the same prompt
+costs thousands of input tokens; when it silently does nothing, the model only
+ever saw the prompt. Measured on one query: **4313** input tokens for
+`gpt-5.4-nano`, against **18** for `gpt-5-nano` and **24–105** for the non-OpenAI
+families.
+
+The reason underneath: "OpenAI-compatible" pins down the *message shape*, not the
+*server-side tools*. Server-side search is a per-vendor feature — OpenAI ships
+`web_search` on `/responses`, Gemini ships `google_search` grounding, Anthropic
+ships its own tool with a different schema, and the Chinese providers expose a
+standalone search endpoint with no model in the loop at all. A gateway that
+proxies OpenAI models honours OpenAI's tool; for anything else the parameter is
+simply not implemented, and an unrecognised entry in `tools` is dropped in
+silence.
 
 ### `openrouter.ai` (protocol `openrouter`)
 

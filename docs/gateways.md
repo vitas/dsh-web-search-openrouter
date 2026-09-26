@@ -30,13 +30,29 @@ Measured with `tools: [{ type: 'web_search' }]` on `/v1/responses`.
 | `gpt-5-mini` | 4 | ~18.3k | larger context, no benefit here |
 | `gpt-6-astra`, `gpt-6-sol`, `gpt-5.6-sol`, `gpt-5.5` | 1–4 | — | work, cost more |
 
-Known **not** to work on this gateway:
+Known **not** to work on this gateway. The three failure modes are worth keeping
+apart, because only one of them is loud:
 
-- `gpt-5-nano` — answers without searching (`searched: false`).
-- `glm-*`, `deepseek-*`, Anthropic and Gemini routes — the native tool is ignored.
-- `:online` model suffixes — `model_not_found`.
-- `plugins: [{ id: 'web' }]` — ignored.
-- `openrouter:web_search` — rejected by the request validator.
+| Models | Mechanism | Evidence (re-measured 2026-09-24) |
+|---|---|---|
+| `glm-5.3-flash`, `deepseek-v4.1-flash`, `qwen3.8-flash`, `minimax-*`, `mimo-*` | **HTTP 200, tool silently ignored.** The provider has no OpenAI-style server-side search, and an unknown entry in `tools` is dropped instead of rejected. | no `web_search_call` block; **24–105 input tokens** on the same prompt, against 4313 for the model that works |
+| `gpt-5-nano` | **HTTP 200, model never calls the tool.** Same family as `gpt-5.4-nano`, so it is the model, not the route. | output was a lone `reasoning` block; **18 input tokens** |
+| `gemini-*`, Anthropic routes | **HTTP 400 at the route**, before any tool question arises. | `model "gemini-3.5-flash-lite" is not supported on /v1/responses; use /v1/chat/completions instead` |
+| `:online` suffixes | `model_not_found` — OpenRouter's routing convention, not implemented here. | |
+| `plugins: [{ id: 'web' }]` | ignored (OpenRouter's older convention). | |
+| `openrouter:web_search` | rejected by the request validator (OpenRouter-proprietary server tool). | |
+
+Input-token count is the reliable tell: a search that really ran injects its
+results back into the context, so the prompt suddenly costs thousands of tokens.
+A silent no-op leaves the count at prompt size. That is the whole reason the
+provider checks `searched` rather than trusting a 200.
+
+The root cause is that "OpenAI-compatible" specifies the message shape, not the
+server-side tools. Every vendor exposes search its own way: OpenAI as the
+`web_search` tool on `/responses`, Gemini as `google_search` grounding,
+Anthropic as its own tool with a different schema, and the Chinese providers as a
+standalone search endpoint with **no model in the loop at all** — which is the
+cheapest architecture of the lot if you are optimising for cost.
 
 ## Cost
 
