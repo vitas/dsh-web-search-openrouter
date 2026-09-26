@@ -18,6 +18,34 @@ A gateway that rejects the chosen protocol says so in the error text
 (`Invalid value: 'openrouter:web_search'`, `Unknown parameter: 'tools'`, …), which
 the plugin surfaces verbatim in the **Test search** panel.
 
+## Why the built-in provider cannot simply be re-pointed
+
+`@deepseek-ai/dsh-web-search-deepseek` (provider id `deepseek-official`) is
+Anthropic-compatible: it appends `/messages` to `baseURL` and sends the native
+`web_search_20250305` server tool. Both `baseURL` and `model` are configurable
+and appear as the **Endpoint** field under Settings → Plugins, so re-pointing it
+at a cheaper gateway looks like a two-field change.
+
+On `api.b.ai` it does not work. Measured 2026-09-24 against
+`https://api.b.ai/v1/messages`, sending that provider's exact body
+(`tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }]`,
+`anthropic-version: 2023-06-01`):
+
+| Model | Result |
+|---|---|
+| `deepseek-v4.1-flash` | HTTP 200, one `text` block, **0 search results**, 44 input tokens — answered from memory |
+| `gpt-5.4-nano` | HTTP 200, a `tool_use` block, **0 search results** — the tool came back as a *client-side* call the model wanted to make, not a server-side search |
+
+So the gateway accepts the request and never searches. `/v1/models` advertises
+`supported_endpoint_types: ["openai", "anthropic"]` for nearly every model, but
+"anthropic" there means the Messages *message shape*, not Anthropic's server
+tools — the same trap as "openai" meaning chat completions rather than
+`/v1/responses`.
+
+Only `/v1/responses` with the native OpenAI tool runs a search on this gateway,
+and only for the OpenAI family. Hence the plugin, and hence the search model
+being configured separately from the chat model.
+
 ## `api.b.ai` — verified model matrix
 
 Measured with `tools: [{ type: 'web_search' }]` on `/v1/responses`.
